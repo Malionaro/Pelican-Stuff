@@ -1,0 +1,72 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PANEL",
+    "meta": {
+        "version": "PLCN_v3",
+        "update_url": "https://raw.githubusercontent.com/Malionaro/Pelican-Stuff/main/Eggs/Minecraft/NeoForge/egg-neo-forge.json"
+    },
+    "exported_at": "2025-11-24T08:47:32+00:00",
+    "name": "NeoForge",
+    "author": "glorantv@icloud.com",
+    "uuid": "e23e092f-b803-4f34-82cf-2d6518c6351a",
+    "description": "NeoForge Server. NeoForge is a modding API (Application Programming Interface), which makes it easier to create mods, and also make sure mods are compatible with each other. NeoForge is a fork of Minecraft Forge.",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAACXBIWXMAAAsSAAALEgHS3X78AAAAPFBMVEWLjpQAAAD59PTm8vHV4N/n2dPH0dG9x8fHo7mqsLOgpanmjDfXdC+NcWi/YTR1dYCkTjdmU00mKjMTFRpppmRQAAAAAnRSTlP/AOW3MEoAAAE3SURBVHja7dvLboMwAERRcHjEqWtM+P9/7WLIYiyKoFXTVrlniZDnbmDnpv1lTfupFwtono4AAgiohjtzOaD7pkYIIICAh4tEGWVwsxlklNmMm/xwAgggoHE+ObpZ3sUDVv7KbgcBBBCwHdCJd8x+bC+zFDNLL9ZRh0QhgAAC/lrAuKU6/SpFsilylapx3EIAAQScCcgmyZtJks12QBQCCCDgSIBPujrAeQ4BBBBwPqAaDtKLByTTS5AqhAACCNgOmGT3PxDkLmnHXYLk1WCiTEIAAQRUAVGKVF/3IkmySbJIL2lVJAoBBBCwH2CKhZxXfJkAAgj4ekA2QRYTJBsCCCDg/wc8FBOkN0GKiSsCCCDgSIA/jXuKOT9JAAEE7AbcJP6ImxBAAAFVQCvT07VCAAEEcPWbgA9tTDwHvNgQFgAAAABJRU5ErkJggg==",
+    "tags": [],
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit"
+    ],
+    "docker_images": {
+        "Java 21": "ghcr.io/parkervcp/yolks:java_21",
+        "Java 17": "ghcr.io/parkervcp/yolks:java_17",
+        "Java 16": "ghcr.io/parkervcp/yolks:java_16",
+        "Java 11": "ghcr.io/parkervcp/yolks:java_11",
+        "Java 8": "ghcr.io/parkervcp/yolks:java_8"
+    },
+    "file_denylist": [],
+    "startup_commands": {
+        "Default": "java -Xms128M -XX:MaxRAMPercentage=95.0 -Dterminal.jline=false -Dterminal.ansi=true @unix_args.txt"
+    },
+    "config": {
+        "files": "{\n    \"server.properties\": {\n        \"parser\": \"properties\",\n        \"find\": {\n            \"server-ip\": \"0.0.0.0\",\n            \"server-port\": \"{{server.allocations.default.port}}\",\n            \"query.port\": \"{{server.allocations.default.port}}\"\n        }\n    }\n}",
+        "startup": "{\n    \"done\": \")! For help, type \"\n}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\n# NeoForge Installation Script (Fix for Debian 12 / Pelican)\n# Server Files: /mnt/server\n\necho \"Aktualisiere Paketquellen und installiere Java 21...\"\napt-get update\napt-get install -y software-properties-common\necho \"deb http://deb.debian.org/debian bookworm-backports main\" > /etc/apt/sources.list.d/backports.list\napt-get update\napt-get install -y -t bookworm-backports openjdk-21-jdk || apt-get install -y openjdk-17-jdk\napt-get install -y curl xq jq\n\nif ! command -v java &> /dev/null; then\n    echo \"FEHLER: Java konnte nicht installiert werden. Das Skript kann den Installer nicht ausführen.\"\n    exit 1\nfi\n\nif [[ ! -d /mnt/server ]]; then\n    mkdir -p /mnt/server\nfi\n\ncd /mnt/server\n\nNEOFORGE_VERSION=\"$(echo \"$NEOFORGE_VERSION\" | tr -d ' ')\"\nMC_VERSION=\"$(echo \"$MC_VERSION\" | tr -d ' ')\"\n\nif [[ \"$NEOFORGE_VERSION\" == *\"-\"* ]] && [[ ! \"$NEOFORGE_VERSION\" =~ \"1.20.1\" ]]; then\n    NEOFORGE_VERSION=$(echo $NEOFORGE_VERSION | cut -d'-' -f2-)\nfi\n\nif [[ ! -z ${NEOFORGE_VERSION} ]]; then\n    if [[ \"${NEOFORGE_VERSION}\" =~ \"1.20.1-\" ]]; then\n        DOWNLOAD_LINK=\"https://maven.neoforged.net/releases/net/neoforged/forge/${NEOFORGE_VERSION}/forge-${NEOFORGE_VERSION}-installer.jar\"\n        ARTIFACT_NAME=\"forge\"\n    else\n        DOWNLOAD_LINK=\"https://maven.neoforged.net/releases/net/neoforged/neoforge/${NEOFORGE_VERSION}/neoforge-${NEOFORGE_VERSION}-installer.jar\"\n        ARTIFACT_NAME=\"neoforge\"\n    fi\nelse\n    if [[ \"${MC_VERSION}\" == \"1.20.1\" ]]; then\n        XML_DATA=$(curl -sSL https://maven.neoforged.net/releases/net/neoforged/forge/maven-metadata.xml)\n        ARTIFACT_NAME=\"forge\"\n        VERSION_KEY=\"1.20.1-\"\n    else\n        XML_DATA=$(curl -sSL https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml)\n        ARTIFACT_NAME=\"neoforge\"\n        if [[ \"${MC_VERSION}\" == \"latest\" ]] || [[ \"${MC_VERSION}\" == \"\" ]]; then\n            VERSION_KEY=\"\"\n        else\n            VERSION_KEY=\"$(echo ${MC_VERSION} | cut -d'.' -f2-).\"\n        fi\n    fi\n\n    if [[ -z \"${VERSION_KEY}\" ]]; then\n        NEOFORGE_VERSION=$(echo -e \"${XML_DATA}\" | xq -x '/metadata/versioning/release')\n    else\n        NEOFORGE_VERSION=$(echo -e \"${XML_DATA}\" | xq -x \"(/metadata/versioning/versions/*[starts-with(text(), '${VERSION_KEY}')])\" | tail -n1)\n    fi\n\n    DOWNLOAD_LINK=\"https://maven.neoforged.net/releases/net/neoforged/${ARTIFACT_NAME}/${NEOFORGE_VERSION}/${ARTIFACT_NAME}-${NEOFORGE_VERSION}-installer.jar\"\nfi\n\necho \"Zusammenfassung:\"\necho \"----------------\"\necho \"Minecraft Version: ${MC_VERSION}\"\necho \"NeoForge Version:  ${NEOFORGE_VERSION}\"\necho \"Download Link:     ${DOWNLOAD_LINK}\"\necho \"----------------\"\n\nif curl --output /dev/null --silent --head --fail \"${DOWNLOAD_LINK}\"; then\n    echo \"Download-Link valide. Starte Download...\"\n    curl -sL -o installer.jar \"${DOWNLOAD_LINK}\"\nelse\n    echo \"FEHLER: Download-Link ungültig!\"\n    exit 2\nfi\n\nrm -rf libraries/net/neoforged/${ARTIFACT_NAME}\nrm -f unix_args.txt\n\necho \"Starte NeoForge Installer...\"\njava -jar installer.jar --installServer || { echo \"Installer fehlgeschlagen\"; exit 5; }\n\nARGS_FILE=$(find libraries/net/neoforged/${ARTIFACT_NAME} -name \"unix_args.txt\" | head -n 1)\nif [[ ! -z \"$ARGS_FILE\" ]]; then\n    ln -sf \"$ARGS_FILE\" unix_args.txt\n    echo \"Symlink für Start-Argumente erstellt.\"\nfi\n\nrm -f installer.jar\necho \"Installation erfolgreich beendet!\"",
+            "container": "ghcr.io/parkervcp/installers:debian",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "sort": 1,
+            "name": "Minecraft Version",
+            "description": "The version of Minecraft you want to install for.\r\n\r\nLeaving latest will install the latest version.",
+            "env_variable": "MC_VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": [
+                "required",
+                "string",
+                "max:9"
+            ]
+        },
+        {
+            "sort": 2,
+            "name": "NeoForge Version",
+            "description": "The full exact version.\r\n\r\nEx. 21.1.215 or 1.20.1-47.1.95\r\n\r\nOverrides MC_VERSION. If it fails to download the server files it will fail to install.",
+            "env_variable": "NEOFORGE_VERSION",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": [
+                "nullable",
+                "regex:/^[0-9\\.\\-]+$/"
+            ]
+        }
+    ]
+}
