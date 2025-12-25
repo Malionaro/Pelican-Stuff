@@ -27,6 +27,3 @@ Für Minecraft 1.21+ sollte dein Server dieses Image verwenden:
 ## 📂 Inhalt dieses Repos
 * `install.sh`: Das Haupt-Installationsskript für NeoForge.
 * (Optional: Hier kannst du weitere Skripte auflisten, die du noch hinzufügst)
-
-## ⚖️ Lizenz
-Dieses Projekt ist unter der [MIT License](LICENSE) lizenziert.
