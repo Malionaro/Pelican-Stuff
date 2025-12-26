@@ -13,13 +13,6 @@ Dieses Repository enthält ein robustes Installations-Skript für NeoForge Minec
 
 ## 🚀 Nutzung im Panel
 
-1. Gehe in dein Pelican/Pterodactyl Panel.
-2. Bearbeite das **Installation Script** deines Minecraft Eggs.
-3. Kopiere den Inhalt der Datei `install.sh` aus diesem Repo hinein.
-4. Stelle sicher, dass folgende Variablen gesetzt sind:
-   - `MC_VERSION`: z.B. `1.21.1`
-   - `NEOFORGE_VERSION`: (optional für spezifische Versionen)
-
 ### Empfohlenes Docker-Image
 Für Minecraft 1.21+ sollte dein Server dieses Image verwenden:
 `ghcr.io/pterodactyl/yolks:java_21`
