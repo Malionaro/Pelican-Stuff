@@ -18,7 +18,7 @@ Für Minecraft 1.21+ sollte dein Server dieses Image verwenden:
 `ghcr.io/pterodactyl/yolks:java_21`
 
 ## 📂 Inhalt dieses Repos
-* `install.sh`: Das Haupt-Installationsskript für NeoForge.
+* Das Haupt-Installationsskript für NeoForge.
 * (Optional: Hier kannst du weitere Skripte auflisten, die du noch hinzufügst)
 
 ## ⚖️ Lizenz
